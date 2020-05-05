@@ -52,23 +52,48 @@ def spider_results():
     process.start()
     return results
 
+def print_differentials(original_data, results):
+    diff = []
+    if len(original_data) != 0:
+        for original_result in original_data:
+            original_id = original_result["id"]
+            for result in results:
+                id = result["id"]
+                if id == original_id:
+                    if original_result["price"] != result["price"]:
+                        diff.append([original_result, result])
+    return diff
 
+def find_new_listings(original_data, results):
+    known_ids = []
+    new = []
+    for original_result in original_data:
+        known_ids.append(original_result["id"])
+
+    if len(known_ids) != 0:
+        for result in results:
+            if result["id"] not in known_ids:
+                new.append(result)
+    
+    return new
+    
 if __name__ == "__main__":
     results = filter_results(spider_results())
+    
     try:
         original_data = json.load(open("metadata.json", "r"))
     except FileNotFoundError:
         original_data = []
-    
-    if len(original_data) != 0:
-        for result in results:
-            id = result["id"]
-            for original_result in original_data:
-                original_id = original_result["id"]
 
-                if id == original_id:
-                    print("match")
-    
+    diff = print_differentials(original_data, results)
+    new = find_new_listings(original_data, results)
+
+    with open("diff.json", "w") as f:
+        json.dump(diff, f, ensure_ascii=False, indent=4)
+
+    with open("new.json", "w") as f:
+        json.dump(new, f, ensure_ascii=False, indent=4)
+                    
     clear_output_file()
     with open("metadata.json", "a") as f:
         json.dump(results, f, ensure_ascii=False, indent=4)
