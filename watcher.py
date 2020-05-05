@@ -2,7 +2,8 @@ from scrapy import signals, Spider
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 from scrapy.signalmanager import dispatcher
-
+from email.message import EmailMessage
+import smtplib
 import json
 
 
@@ -28,8 +29,10 @@ class CLSpider(Spider):
                 callback=self.parse
             )
 
+
 def clear_output_file():
     open("metadata.json", "w").write("")
+
 
 def filter_results(results):
     ret = []
@@ -52,7 +55,8 @@ def spider_results():
     process.start()
     return results
 
-def print_differentials(original_data, results):
+
+def return_changed_listings(original_data, results):
     diff = []
     if len(original_data) != 0:
         for original_result in original_data:
@@ -64,7 +68,8 @@ def print_differentials(original_data, results):
                         diff.append([original_result, result])
     return diff
 
-def find_new_listings(original_data, results):
+
+def return_new_listings(original_data, results):
     known_ids = []
     new = []
     for original_result in original_data:
@@ -74,27 +79,46 @@ def find_new_listings(original_data, results):
         for result in results:
             if result["id"] not in known_ids:
                 new.append(result)
-    
+
     return new
-    
+
+
+def create_smtp_session_and_send_email(msg_str):
+    email_auth = json.load(open("email.json", "r"))
+
+    msg = EmailMessage()
+    msg['from'] = email_auth["user"]
+    msg['to'] = email_auth["mailto"]
+    msg['subject'] = 'Craigslist updates'
+    msg.set_content(msg_str)
+
+    mailserver = smtplib.SMTP('smtp.office365.com', 587)
+    mailserver.ehlo()
+    mailserver.starttls()
+    mailserver.login(email_auth["user"], email_auth["password"])
+    mailserver.send_message(msg)
+    mailserver.quit()
+
 if __name__ == "__main__":
+
     results = filter_results(spider_results())
-    
+
     try:
         original_data = json.load(open("metadata.json", "r"))
     except FileNotFoundError:
         original_data = []
 
-    diff = print_differentials(original_data, results)
-    new = find_new_listings(original_data, results)
+    msg_str = ""
 
-    with open("diff.json", "w") as f:
-        json.dump(diff, f, ensure_ascii=False, indent=4)
+    for listing in return_changed_listings(original_data, results):
+        msg_str += "A listing has changed: "+str(listing)+"\n"
 
-    with open("new.json", "w") as f:
-        json.dump(new, f, ensure_ascii=False, indent=4)
-                    
+    for listing in return_new_listings(original_data, results):
+        msg_str += "A new listing has been found: "+str(listing)+"\n"
+
+    if msg_str != "":
+        create_smtp_session_and_send_email(msg_str)
+
     clear_output_file()
     with open("metadata.json", "a") as f:
         json.dump(results, f, ensure_ascii=False, indent=4)
-
