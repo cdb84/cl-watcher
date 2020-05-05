@@ -57,6 +57,10 @@ if __name__ == "__main__":
     results = filter_results(spider_results())
     try:
         original_data = json.load(open("metadata.json", "r"))
+    except FileNotFoundError:
+        original_data = []
+    
+    if len(original_data) != 0:
         for result in results:
             id = result["id"]
             for original_result in original_data:
@@ -64,8 +68,7 @@ if __name__ == "__main__":
 
                 if id == original_id:
                     print("match")
-    except ValueError:
-        print("No JSON data saved from last run.")
+    
     clear_output_file()
     with open("metadata.json", "a") as f:
         json.dump(results, f, ensure_ascii=False, indent=4)
