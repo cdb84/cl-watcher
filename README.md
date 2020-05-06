@@ -1,12 +1,14 @@
 ## Usage
 
-Create `email.json` with the following in the same directory as `watcher.py`:
+Create `conf.json` with the following in the same directory as `watcher.py`:
 
 ```json
 {
     "user":"myExchangeEmailAddr@some.com",
     "password":"my_password",
-    "mailto":"theEmailToSendUpdatesTo@example.com"
+    "mailto":"theEmailToSendUpdatesTo@example.com",
+    "smtp_server": "my.smtp.server.com",
+    "port": 587
 }
 ```
 

@@ -58,14 +58,13 @@ def spider_results():
 
 def return_changed_listings(original_data, results):
     diff = []
-    if len(original_data) != 0:
-        for original_result in original_data:
-            original_id = original_result["id"]
-            for result in results:
-                id = result["id"]
-                if id == original_id:
-                    if original_result["price"] != result["price"]:
-                        diff.append([original_result, result])
+    for original_result in original_data:
+        original_id = original_result["id"]
+        for result in results:
+            result_id = result["id"]
+            if result_id == original_id:
+                if original_result["price"] != result["price"]:
+                    diff.append([original_result, result])
     return diff
 
 
@@ -84,7 +83,7 @@ def return_new_listings(original_data, results):
 
 
 def create_smtp_session_and_send_email(msg_str):
-    email_auth = json.load(open("email.json", "r"))
+    email_auth = json.load(open("conf.json", "r"))
 
     msg = EmailMessage()
     msg['from'] = email_auth["user"]
@@ -92,7 +91,7 @@ def create_smtp_session_and_send_email(msg_str):
     msg['subject'] = 'Craigslist updates'
     msg.set_content(msg_str)
 
-    mailserver = smtplib.SMTP('smtp.office365.com', 587)
+    mailserver = smtplib.SMTP(email_auth["smtp_server"], email_auth["port"])
     mailserver.ehlo()
     mailserver.starttls()
     mailserver.login(email_auth["user"], email_auth["password"])
@@ -117,6 +116,7 @@ if __name__ == "__main__":
         msg_str += "A new listing has been found: "+str(listing)+"\n"
 
     if msg_str != "":
+        print("Message: "+msg_str)
         create_smtp_session_and_send_email(msg_str)
 
     clear_output_file()
