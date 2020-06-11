@@ -97,6 +97,7 @@ def create_smtp_session_and_send_email(msg_str):
     mailserver.send_message(msg)
     mailserver.quit()
 
+
 if __name__ == "__main__":
 
     results = filter_results(spider_results())
