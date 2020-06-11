@@ -9,8 +9,7 @@ import json
 
 class CLSpider(Spider):
     name = "cl-spider"
-    start_urls = ["https://pittsburgh.craigslist.org/search/sss?query=klr%20650&sort=rel",
-                  "https://philadelphia.craigslist.org/search/sss?query=klr%20650&sort=rel"]
+    start_urls = json.load(open("conf.json", "r"))["urls"]
 
     def parse(self, response):
         for cl in response.css(".result-row"):
