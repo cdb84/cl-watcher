@@ -8,17 +8,17 @@ Create `conf.json` with the following in the same directory as `watcher.py`:
     "password":"my_password",
     "mailto":"theEmailToSendUpdatesTo@example.com",
     "smtp_server": "my.smtp.server.com",
-    "port": 587
+    "port": 587,
+    "urls": ["https://pittsburgh.craigslist.org/search/sss?query=klr%20650&sort=rel",
+             "https://philadelphia.craigslist.org/search/sss?query=klr%20650&sort=rel"]
 }
 ```
 
-Edit the following lines of `watcher.py` by changing start_urls to the URL of your Craigslist search (i.e. go to Craigslist, search 'klr 650' and put whatever is in the address bar in here as string literals):
+Edit the following lines of `conf.json` by changing start_urls to the URL of your Craigslist search (i.e. go to Craigslist, search 'klr 650' and put whatever is in the address bar in here as string literals):
 
-```python
-    class CLSpider(Spider):
-        name = "cl-spider"
-        start_urls = ["https://pittsburgh.craigslist.org/search/sss?query=klr%20650&sort=rel",
-                      "https://philadelphia.craigslist.org/search/sss?query=klr%20650&sort=rel"]
+```json
+    "urls": ["https://pittsburgh.craigslist.org/search/sss?query=klr%20650&sort=rel",
+             "https://philadelphia.craigslist.org/search/sss?query=klr%20650&sort=rel"]
 ```
 
 And then run the whole thing with:
