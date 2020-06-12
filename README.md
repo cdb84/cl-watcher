@@ -1,3 +1,7 @@
+# Craigslist Watcher
+
+Keep yourself in the loop about updates to Craigslist listings
+
 ## Installation
 
 Requires `scrapy`:
