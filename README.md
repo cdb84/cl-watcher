@@ -1,3 +1,8 @@
+## Installation
+
+Requires `scrapy`:
+`pip3 install scrapy`
+
 ## Usage
 
 Create `conf.json` with the following in the same directory as `watcher.py`:
