@@ -1,3 +1,12 @@
+# Craigslist Watcher
+
+Keep yourself in the loop about updates to Craigslist listings
+
+## Installation
+
+Requires `scrapy`:
+`pip3 install scrapy`
+
 ## Usage
 
 Create `conf.json` with the following in the same directory as `watcher.py`:
