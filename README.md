@@ -32,6 +32,6 @@ Edit the following lines of `conf.json` by changing start_urls to the URL of you
 
 And then run the whole thing with:
 
-`python3 watcher.py`
+`python3 watcher.py ~/path_to_conf.json ~/path_to_metadata_can_really_be_anything.json`
 
 It is usually effective as a crontab job, so that you can get email updates every day when there's a new listing.
