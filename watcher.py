@@ -5,11 +5,12 @@ from scrapy.signalmanager import dispatcher
 from email.message import EmailMessage
 import smtplib
 import json
+import sys
 
 
 class CLSpider(Spider):
 	name = "cl-spider"
-	start_urls = json.load(open("conf.json", "r"))["urls"]
+	start_urls = json.load(open(sys.argv[1], "r"))["urls"]
 
 	def parse(self, response):
 		for cl in response.css(".result-row"):
@@ -30,13 +31,13 @@ class CLSpider(Spider):
 
 
 def clear_output_file():
-	open("metadata.json", "w").write("")
+	open(sys.argv[2], "w").write("")
 
 
 def filter_results(results):
 	ret = []
 	for result in results:
-		if result["price"] > 100:
+		if result["price"] > 500 and result["price"] != 9999 and result["price"] != 999 and result["price"] != 1:
 			ret.append(result)
 	return ret
 
@@ -82,7 +83,7 @@ def return_new_listings(original_data, results):
 
 
 def create_smtp_session_and_send_email(msg_str):
-	email_auth = json.load(open("conf.json", "r"))
+	email_auth = json.load(open(sys.argv[1], "r"))
 
 	msg = EmailMessage()
 	msg['from'] = email_auth["user"]
@@ -103,22 +104,22 @@ if __name__ == "__main__":
 	results = filter_results(spider_results())
 
 	try:
-		original_data = json.load(open("metadata.json", "r"))
+		original_data = json.load(open(sys.argv[2], "r"))
 	except FileNotFoundError:
 		original_data = []
 
 	msg_str = ""
 
 	for listing in return_changed_listings(original_data, results):
-		msg_str += "A listing has changed: "+str(listing)+"\n"
+		msg_str += "A listing has changed: "+str(listing)+"\n\n\n"
 
 	for listing in return_new_listings(original_data, results):
-		msg_str += "A new listing has been found: "+str(listing)+"\n"
+		msg_str += "A new listing has been found: "+str(listing)+"\n\n\n"
 
 	if msg_str != "":
 		print("Message: "+msg_str)
 		create_smtp_session_and_send_email(msg_str)
 
 	clear_output_file()
-	with open("metadata.json", "a") as f:
+	with open(sys.argv[2], "a") as f:
 		json.dump(results, f, ensure_ascii=False, indent=4)
