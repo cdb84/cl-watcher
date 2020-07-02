@@ -37,7 +37,7 @@ def clear_output_file():
 def filter_results(results):
 	ret = []
 	for result in results:
-		if result["price"] > 500 and result["price"] != 9999 and result["price"] != 999 and result["price"] != 1:
+		if result["price"] > 500 and result["price"] < 9999 and result["price"] != 999 and result["price"] != 1:
 			ret.append(result)
 	return ret
 
